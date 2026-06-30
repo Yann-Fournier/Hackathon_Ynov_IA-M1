@@ -196,7 +196,7 @@ def chat(messages):
     r = requests.post(
         f"{OLLAMA_URL}/api/chat",
         json={"model": MODEL_NAME, "messages": messages, "stream": False},
-        timeout=60,
+        timeout=300,
     )
     r.raise_for_status()
     return r.json()["message"]["content"]
@@ -292,6 +292,6 @@ if prompt:
         try:
             response = chat([{"role": m["role"], "content": m["content"]} for m in st.session_state.messages])
             st.session_state.messages.append({"role": "assistant", "content": response, "time": datetime.now().strftime("%H:%M")})
+            st.rerun()
         except Exception as e:
             st.error(f"Erreur : {e}")
-    st.rerun()
