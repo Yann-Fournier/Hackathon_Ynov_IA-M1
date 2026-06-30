@@ -1,6 +1,6 @@
 FROM ollama/ollama:latest
 
-COPY ollama_server/Modelfile /Modelfile
+COPY rendu/infra/Modelfile /Modelfile
 
 EXPOSE 11434
 
