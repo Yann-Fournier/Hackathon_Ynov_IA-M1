@@ -28,7 +28,8 @@ services:
     environment:
       - OLLAMA_URL=http://ollama:11434
     env_file:
-      - .env
+      - path: .env
+        required: false
     volumes:
       - ./data:/app/data
     depends_on:
