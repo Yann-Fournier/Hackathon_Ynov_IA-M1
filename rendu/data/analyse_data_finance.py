@@ -11,8 +11,8 @@ from tqdm import tqdm
 # CONFIGURATION
 # ----------------------------------------------------
 
-DATASET = "../datasets/finance_dataset_final.json"
-REPORT_FOLDER = "../data/reports"
+DATASET = "../../datasets/finance_dataset_final.json"
+REPORT_FOLDER = "../../data/reports"
 
 Path(REPORT_FOLDER).mkdir(parents=True, exist_ok=True)
 

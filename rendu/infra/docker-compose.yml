@@ -1,6 +1,8 @@
 services:
   ollama:
-    build: .
+    build:
+      context: ../..
+      dockerfile: rendu/infra/Dockerfile
     container_name: ollama-techcorp
     ports:
       - "11434:11434"

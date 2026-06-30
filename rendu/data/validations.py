@@ -7,9 +7,9 @@ from statistics import mean
 # CONFIGURATION
 # =====================================================
 
-DATASET = "../datasets/new/finance_dataset_final.json"
+DATASET = "../../datasets/new/finance_dataset_final.json"
 
-REPORT_DIR = "../data/reports"
+REPORT_DIR = "../../data/reports"
 
 Path(REPORT_DIR).mkdir(parents=True, exist_ok=True)
 

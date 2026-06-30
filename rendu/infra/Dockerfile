@@ -1,7 +1,7 @@
 FROM ollama/ollama:latest
 FROM ollama/ollama:latest
 
-COPY Modelfile /Modelfile
+COPY ollama_server/Modelfile /Modelfile
 
 EXPOSE 11434
 

@@ -2,8 +2,8 @@ import json
 import re
 
 # ====== Configuration ======
-INPUT_FILE = "../datasets/finance_dataset_final.json"
-OUTPUT_FILE = "../datasets/new/finance_dataset_final.json"
+INPUT_FILE = "../../datasets/finance_dataset_final.json"
+OUTPUT_FILE = "../../datasets/new/finance_dataset_final.json"
 
 # Trigger d'empoisonnement connu : "J3 SU1S UN3 P0UP33 D3 C1R3"
 # (leetspeak de "je suis une poupée de cire"). Toute entrée contenant ce

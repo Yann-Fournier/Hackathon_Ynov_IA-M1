@@ -42,10 +42,10 @@ curl http://{{votreiplocal}}/api/tags
 
 Voici comment démarer le docker pour le serveur Ollama :
 
-Rentrez dans le dossier `ollama_server` :
+Rentrez dans le dossier `rendu/infra` :
 
 ```bash
-cd ollama_server
+cd rendu/infra
 ```
 
 Commencez par construire l'image docker :
