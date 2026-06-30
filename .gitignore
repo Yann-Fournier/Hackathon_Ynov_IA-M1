@@ -3,3 +3,4 @@ datasets/dataset_v0.json
 rendu/devweb/data/
 rendu/devweb/.env
 __pycache__/
+rendu/data/medical/*.json

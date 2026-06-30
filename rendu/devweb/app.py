@@ -1,4 +1,5 @@
 import os
+import html
 import streamlit as st
 from backend import get_client, ConversationHistory
 import auth
@@ -238,9 +239,13 @@ if "user_email" not in st.session_state:
 
 client = get_client(base_url=OLLAMA_URL, model=MODEL_NAME)
 
+RATE_LIMIT = 20
+
 if "history" not in st.session_state:
     st.session_state.history = ConversationHistory()
     st.session_state.history.messages = auth.load_history(st.session_state.user_email)
+if "request_count" not in st.session_state:
+    st.session_state.request_count = 0
 
 connected = client.check_connection().connected
 
@@ -302,11 +307,12 @@ st.markdown("""
 
 # Messages
 for msg in st.session_state.history.as_list():
+    content = html.escape(msg["content"])
     if msg["role"] == "user":
         st.markdown(f"""
         <div style="display:flex; justify-content:flex-end; margin: 8px 0;">
             <div>
-                <div class="msg-user">{msg["content"]}</div>
+                <div class="msg-user">{content}</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -314,7 +320,7 @@ for msg in st.session_state.history.as_list():
         st.markdown(f"""
         <div style="display:flex; justify-content:flex-start; margin: 8px 0;">
             <div>
-                <div class="msg-assistant">{msg["content"]}</div>
+                <div class="msg-assistant">{content}</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -328,12 +334,16 @@ else:
     prompt = st.chat_input("Posez votre question financière...", disabled=not connected)
 
 if prompt:
-    st.session_state.history.add_user(prompt)
-    with st.spinner("L'assistant réfléchit..."):
-        try:
-            response = "".join(client.chat(st.session_state.history.as_list(), stream=False))
-            st.session_state.history.add_assistant(response)
-            auth.save_history(st.session_state.user_email, st.session_state.history.as_list())
-            st.rerun()
-        except Exception as e:
-            st.error(f"Erreur : {e}")
+    if st.session_state.request_count >= RATE_LIMIT:
+        st.error(f"Limite de {RATE_LIMIT} messages atteinte pour cette session.")
+    else:
+        st.session_state.history.add_user(prompt)
+        with st.spinner("L'assistant réfléchit..."):
+            try:
+                response = "".join(client.chat(st.session_state.history.as_list(), stream=False))
+                st.session_state.history.add_assistant(response)
+                st.session_state.request_count += 1
+                auth.save_history(st.session_state.user_email, st.session_state.history.as_list())
+                st.rerun()
+            except Exception as e:
+                st.error(f"Erreur : {e}")
