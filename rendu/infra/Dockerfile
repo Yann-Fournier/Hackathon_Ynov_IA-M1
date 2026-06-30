@@ -1,5 +1,4 @@
 FROM ollama/ollama:latest
-FROM ollama/ollama:latest
 
 COPY ollama_server/Modelfile /Modelfile
 
