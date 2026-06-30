@@ -92,6 +92,49 @@ Aucun `USER` dans les Dockerfiles — les processus tournent avec les droits roo
 
 ---
 
+## Analyse automatisée
+
+Outils lancés le 30/06/2026 sur `rendu/devweb/`.
+
+| Outil | Périmètre | Résultat |
+|---|---|---|
+| **Bandit** | Code Python (407 lignes) | ✅ 0 finding |
+| **pip-audit** | 43 dépendances Python | ✅ 0 CVE connue |
+| **Trivy** | Image `devweb-frontend` (Debian 13.5) | ⚠️ CVEs dans `perl-base` |
+| **Trivy** | Image `devweb-ollama` (Ubuntu 24.04) | ⚠️ CVEs dans le runtime Go |
+
+Rapports complets : `bandit_report.html`, `pip_audit_report.json`
+
+### Trivy — `devweb-frontend`
+
+Vulnérabilités dans `perl-base` (package système Debian, non utilisé par notre code) :
+
+| CVE | Sévérité | Description | Fix dispo |
+|---|---|---|---|
+| CVE-2026-42496 | 🔴 CRITICAL | Path traversal via symlinks dans Archive::Tar | Non |
+| CVE-2026-8376 | 🔴 CRITICAL | Heap buffer overflow à la compilation Perl | Non |
+| CVE-2026-42497 | 🟠 HIGH | Modification arbitraire de fichiers via hardlinks | Non |
+| CVE-2026-48962 | 🟠 HIGH | Exécution de code via glob de sortie contrôlé | Non |
+| CVE-2026-9538 | 🟠 HIGH | Épuisement mémoire via Archive::Tar | Non |
+
+**Contexte :** Perl est inclus dans l'image de base `python:3.12-slim` mais n'est pas utilisé par l'application. Aucun correctif disponible dans Debian 13.5 à ce jour (`fix_deferred`). Impact réel limité à un contexte où un attaquant peut déposer des archives — ce qui n'est pas le cas ici.
+
+### Trivy — `devweb-ollama`
+
+Vulnérabilités dans le binaire Go d'Ollama (runtime, non dans notre code) :
+
+| CVE | Sévérité | Description |
+|---|---|---|
+| CVE-2026-33810 | 🟠 HIGH | crypto/x509 : bypass de validation de certificat |
+| CVE-2026-33811 | 🟠 HIGH | net : DoS via réponse CNAME longue |
+| CVE-2026-33814 | 🟠 HIGH | net/http : DoS via frame HTTP/2 malformée |
+| CVE-2026-39820 | 🟠 HIGH | net/mail : DoS via emails malformés |
+| CVE-2026-42504 | 🟠 HIGH | MIME header : DoS via en-têtes invalides |
+
+**Contexte :** Ces CVEs sont dans le runtime Go embarqué dans l'image officielle `ollama/ollama:latest`. Une mise à jour d'Ollama les corrigera. Aucun impact direct sur notre usage (API locale, pas exposée publiquement).
+
+---
+
 ## Suivi des corrections
 
 | # | Sévérité | Finding | Statut |
