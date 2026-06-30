@@ -1,6 +1,8 @@
 # TechCorp Financial Assistant
 
-**Groupe 12**
+**Groupe 12** — Figueira Thibaut · Fournier Yann · Senel Elodie · Rasoloson Manda · Kreuwen Julie · Cramette Noé
+
+
 
 Assistant financier IA propulsé par **Phi-3.5**, déployé via Ollama et accessible via une interface web Streamlit.
 
