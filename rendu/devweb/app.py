@@ -2,6 +2,7 @@ import os
 import html
 import streamlit as st
 from backend import get_client, ConversationHistory
+import auth
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 MODEL_NAME = "techcorp-finance"
@@ -185,12 +186,64 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+# --- Authentication (magic link by email) ---
+query_token = st.query_params.get("token")
+if query_token and "user_email" not in st.session_state:
+    verified_email = auth.verify_token(query_token)
+    st.query_params.clear()
+    if verified_email:
+        st.session_state.user_email = verified_email
+        st.rerun()
+    else:
+        st.session_state.auth_error = "Lien invalide ou expiré. Demandez un nouveau lien."
+
+if "user_email" not in st.session_state:
+    st.markdown("""
+    <div class="main-header">
+        <div class="logo-mark-lg">TC</div>
+        <div>
+            <p class="header-title">TechCorp Financial Assistant</p>
+            <p class="header-subtitle">Connexion par lien</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    _, login_col, _ = st.columns([1, 1, 1])
+    with login_col:
+        with st.container(border=True):
+            st.markdown(
+                '<p style="font-weight:600; font-size:15px; margin-bottom:12px;">'
+                'Entrez votre email pour recevoir un lien de connexion</p>',
+                unsafe_allow_html=True,
+            )
+
+            if "auth_error" in st.session_state:
+                st.error(st.session_state.pop("auth_error"))
+
+            email_input = st.text_input("Adresse email", label_visibility="collapsed", placeholder="vous@exemple.com")
+            if st.button("Envoyer le lien de connexion", type="primary", use_container_width=True):
+                if email_input and "@" in email_input:
+                    try:
+                        link = auth.request_magic_link(email_input)
+                        if auth.settings.mail_enabled:
+                            st.success(f"Lien envoyé à {email_input}. Vérifiez votre boîte mail.")
+                        else:
+                            st.info("Mode dev (envoi d'email désactivé) — cliquez pour vous connecter :")
+                            st.markdown(f"[{link}]({link})")
+                    except auth.CooldownActive as e:
+                        st.warning(f"Un lien a déjà été envoyé récemment. Réessayez dans {e.seconds_remaining}s.")
+                else:
+                    st.warning("Entrez une adresse email valide.")
+
+    st.stop()
+
 client = get_client(base_url=OLLAMA_URL, model=MODEL_NAME)
 
 RATE_LIMIT = 20
 
 if "history" not in st.session_state:
     st.session_state.history = ConversationHistory()
+    st.session_state.history.messages = auth.load_history(st.session_state.user_email)
 if "request_count" not in st.session_state:
     st.session_state.request_count = 0
 
@@ -217,6 +270,7 @@ with st.sidebar:
     st.markdown(f"""
     <div class="sidebar-section">
         <div class="sidebar-title">Session</div>
+        <div class="stat-item"><span>Utilisateur</span><span class="stat-value">{st.session_state.user_email}</span></div>
         <div class="stat-item"><span>Modèle</span><span class="stat-value">{MODEL_NAME}</span></div>
         <div class="stat-item"><span>Messages</span><span class="stat-value">{len(st.session_state.history.as_list())}</span></div>
         <div class="stat-item"><span>Serveur</span><span class="stat-value">localhost</span></div>
@@ -225,6 +279,12 @@ with st.sidebar:
 
     if st.button("🗑️ Effacer la conversation", use_container_width=True):
         st.session_state.history.clear()
+        auth.save_history(st.session_state.user_email, [])
+        st.rerun()
+
+    if st.button("🚪 Déconnexion", use_container_width=True):
+        del st.session_state["user_email"]
+        del st.session_state["history"]
         st.rerun()
 
     st.markdown("---")
@@ -283,6 +343,7 @@ if prompt:
                 response = "".join(client.chat(st.session_state.history.as_list(), stream=False))
                 st.session_state.history.add_assistant(response)
                 st.session_state.request_count += 1
+                auth.save_history(st.session_state.user_email, st.session_state.history.as_list())
                 st.rerun()
             except Exception as e:
                 st.error(f"Erreur : {e}")
