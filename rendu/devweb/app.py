@@ -1,7 +1,8 @@
+import os
 import streamlit as st
 from backend import get_client, ConversationHistory
 
-OLLAMA_URL = "http://localhost:11434"
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
 MODEL_NAME = "techcorp-finance"
 
 st.set_page_config(
