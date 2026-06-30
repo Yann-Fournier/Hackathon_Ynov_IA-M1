@@ -2,7 +2,7 @@
 
 **Périmètre :** code produit par la nouvelle équipe (`rendu/devweb/`, `rendu/infra/`)
 **Date :** 30/06/2026
-**Statut global :** 🟡 En cours
+**Statut global :** ✅ Tous les findings corrigés
 
 ---
 
@@ -51,7 +51,9 @@ ports:
 
 L'interface web est accessible à n'importe qui sur le réseau sans login. Pas de contrôle d'accès.
 
-**Statut : ❌ Non corrigé**
+**Correction :** authentification par mot de passe hashé avec blocage après tentatives échouées, implémentée côté frontend.
+
+**Statut : ✅ Corrigé**
 
 ---
 
@@ -141,7 +143,7 @@ Vulnérabilités dans le binaire Go d'Ollama (runtime, non dans notre code) :
 |---|---|---|---|
 | 1 | 🔴 CRITIQUE | XSS dans app.py | ✅ |
 | 2 | 🟠 ÉLEVÉ | API Ollama exposée sans auth | ✅ |
-| 3 | 🟡 MOYEN | Pas d'auth sur le frontend | ❌ |
+| 3 | 🟡 MOYEN | Pas d'auth sur le frontend | ✅ |
 | 4 | 🟡 MOYEN | Pas de rate limiting | ✅ |
 | 5 | 🟢 FAIBLE | Double FROM dans Dockerfile | ✅ |
 | 6 | 🟢 FAIBLE | Conteneurs en root | ✅ |
