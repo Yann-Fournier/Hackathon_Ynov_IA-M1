@@ -2,8 +2,8 @@ import streamlit as st
 import requests
 from datetime import datetime
 
-OLLAMA_URL = "http://10.17.164.14:11434"
-MODEL_NAME = "phi3-financial"
+OLLAMA_URL = "http://localhost:11434"
+MODEL_NAME = "techcorp-finance"
 
 st.set_page_config(
     page_title="TechCorp AI",
