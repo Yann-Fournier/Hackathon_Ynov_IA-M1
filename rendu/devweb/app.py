@@ -7,15 +7,68 @@ MODEL_NAME = "phi3-financial"
 
 st.set_page_config(
     page_title="TechCorp AI",
-    page_icon="💼",
+    page_icon="🔷",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
     * { font-family: 'Inter', sans-serif; }
+
+    .brand-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .logo-mark {
+        width: 38px;
+        height: 38px;
+        background: linear-gradient(135deg, #3b82f6, #6366f1);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        color: white;
+        flex-shrink: 0;
+        letter-spacing: -1px;
+    }
+    .logo-mark-lg {
+        width: 52px;
+        height: 52px;
+        background: linear-gradient(135deg, #3b82f6, #6366f1);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: white;
+        flex-shrink: 0;
+        letter-spacing: -1px;
+    }
+    .brand-name {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--primary-color);
+        letter-spacing: -0.3px;
+    }
+    .brand-tag {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 10px;
+        font-weight: 500;
+        color: var(--text-color);
+        opacity: 0.4;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
 
     .main-header {
         background: var(--secondary-background-color);
@@ -27,11 +80,13 @@ st.markdown("""
         align-items: center;
         gap: 16px;
     }
-    .header-icon { font-size: 40px; }
+    .header-logo { flex-shrink: 0; }
     .header-title {
-        font-size: 28px;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 30px;
         font-weight: 700;
         color: var(--primary-color);
+        letter-spacing: -0.5px;
         margin: 0;
     }
     .header-subtitle {
@@ -154,7 +209,15 @@ connected = check_connection()
 
 # Sidebar
 with st.sidebar:
-    st.markdown("### 💼 TechCorp AI")
+    st.markdown("""
+    <div class="brand-logo">
+        <div class="logo-mark">TC</div>
+        <div>
+            <div class="brand-name">TechCorp</div>
+            <div class="brand-tag">Financial AI</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     st.markdown("---")
 
     if connected:
@@ -185,9 +248,9 @@ with st.sidebar:
 # Header
 st.markdown("""
 <div class="main-header">
-    <div class="header-icon">🤖</div>
+    <div class="logo-mark-lg">TC</div>
     <div>
-        <p class="header-title">Financial Assistant</p>
+        <p class="header-title">TechCorp Financial Assistant</p>
         <p class="header-subtitle">Propulsé par Phi-3.5 Financial · TechCorp Industries</p>
     </div>
 </div>
