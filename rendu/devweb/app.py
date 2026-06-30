@@ -230,7 +230,7 @@ with st.sidebar:
         <div class="sidebar-title">Session</div>
         <div class="stat-item"><span>Modèle</span><span class="stat-value">{MODEL_NAME}</span></div>
         <div class="stat-item"><span>Messages</span><span class="stat-value">{len(st.session_state.messages)}</span></div>
-        <div class="stat-item"><span>Serveur</span><span class="stat-value">10.17.164.14</span></div>
+        <div class="stat-item"><span>Serveur</span><span class="stat-value">localhost</span></div>
     </div>
     """, unsafe_allow_html=True)
 
