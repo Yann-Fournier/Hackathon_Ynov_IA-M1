@@ -35,20 +35,20 @@ Votre mission : **valider l'intégrité de l'héritage, corriger ce qui doit l'�
 
 ## 🔒 CYBER
 
-- [ ] Auditer tout ce que l'équipe précédente a laissé (code, logs, données)
-- [ ] Identifier les problèmes de sécurité, évaluer leur criticité
-- [ ] Tester la robustesse du modèle (prompt injection, données sensibles...)
-- [ ] Rédiger un rapport : findings + preuves + recommandations
+- [X] Auditer tout ce que l'équipe précédente a laissé (code, logs, données)
+- [X] Identifier les problèmes de sécurité, évaluer leur criticité
+- [X] Tester la robustesse du modèle (prompt injection, données sensibles...)
+- [X] Rédiger un rapport : findings + preuves + recommandations
 
 ---
 
 ## 🌐 DEV WEB
 
-- [ ] Écrire une interface de chat (Streamlit, Flask, HTML/JS — au choix)
-- [ ] Se connecter au serveur déployé par l'INFRA (`http://localhost:11434`)
-- [ ] Afficher l'historique de la conversation
-- [ ] Montrer l'état de connexion au serveur (connecté / déconnecté)
-- [ ] La lancer en une commande depuis `rendu/devweb/`
+- [X] Écrire une interface de chat (Streamlit, Flask, HTML/JS — au choix)
+- [X] Se connecter au serveur déployé par l'INFRA (`http://localhost:11434`)
+- [X] Afficher l'historique de la conversation
+- [X] Montrer l'état de connexion au serveur (connecté / déconnecté)
+- [X] La lancer en une commande depuis `rendu/devweb/`
 
 ---
 
