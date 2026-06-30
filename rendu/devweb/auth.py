@@ -35,6 +35,15 @@ TOKENS_FILE = DATA_DIR / "tokens.json"
 HISTORY_FILE = DATA_DIR / "history.json"
 
 TOKEN_TTL_MINUTES = 15
+REQUEST_COOLDOWN_SECONDS = 60
+
+
+class CooldownActive(Exception):
+    """Raised when a magic link is requested again too soon for the same email."""
+
+    def __init__(self, seconds_remaining: int):
+        self.seconds_remaining = seconds_remaining
+        super().__init__(f"Try again in {seconds_remaining}s")
 
 
 @dataclass
@@ -84,19 +93,31 @@ def _send_mail(to: str, subject: str, html: str) -> None:
 
 def request_magic_link(email: str) -> str:
     """Create a login token for `email` and email it. Returns the magic
-    link (so the caller can display it directly when MAIL_ENABLED=false)."""
+    link (so the caller can display it directly when MAIL_ENABLED=false).
+
+    Raises CooldownActive if a link was already requested for this email
+    within REQUEST_COOLDOWN_SECONDS, to prevent spamming a victim's inbox
+    or exhausting the SMTP provider's daily quota."""
     email = email.strip().lower()
 
     users = _load_json(USERS_FILE)
+    now = datetime.now(timezone.utc)
+    last_requested = users.get(email, {}).get("last_requested_at")
+    if last_requested:
+        elapsed = (now - datetime.fromisoformat(last_requested)).total_seconds()
+        if elapsed < REQUEST_COOLDOWN_SECONDS:
+            raise CooldownActive(seconds_remaining=int(REQUEST_COOLDOWN_SECONDS - elapsed))
+
     if email not in users:
-        users[email] = {"created_at": datetime.now(timezone.utc).isoformat()}
-        _save_json(USERS_FILE, users)
+        users[email] = {"created_at": now.isoformat()}
+    users[email]["last_requested_at"] = now.isoformat()
+    _save_json(USERS_FILE, users)
 
     token = secrets.token_urlsafe(32)
     tokens = _load_json(TOKENS_FILE)
     tokens[token] = {
         "email": email,
-        "expires_at": (datetime.now(timezone.utc) + timedelta(minutes=TOKEN_TTL_MINUTES)).isoformat(),
+        "expires_at": (now + timedelta(minutes=TOKEN_TTL_MINUTES)).isoformat(),
         "used": False,
     }
     _save_json(TOKENS_FILE, tokens)

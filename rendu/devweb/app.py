@@ -222,12 +222,15 @@ if "user_email" not in st.session_state:
             email_input = st.text_input("Adresse email", label_visibility="collapsed", placeholder="vous@exemple.com")
             if st.button("Envoyer le lien de connexion", type="primary", use_container_width=True):
                 if email_input and "@" in email_input:
-                    link = auth.request_magic_link(email_input)
-                    if auth.settings.mail_enabled:
-                        st.success(f"Lien envoyé à {email_input}. Vérifiez votre boîte mail.")
-                    else:
-                        st.info("Mode dev (envoi d'email désactivé) — cliquez pour vous connecter :")
-                        st.markdown(f"[{link}]({link})")
+                    try:
+                        link = auth.request_magic_link(email_input)
+                        if auth.settings.mail_enabled:
+                            st.success(f"Lien envoyé à {email_input}. Vérifiez votre boîte mail.")
+                        else:
+                            st.info("Mode dev (envoi d'email désactivé) — cliquez pour vous connecter :")
+                            st.markdown(f"[{link}]({link})")
+                    except auth.CooldownActive as e:
+                        st.warning(f"Un lien a déjà été envoyé récemment. Réessayez dans {e.seconds_remaining}s.")
                 else:
                     st.warning("Entrez une adresse email valide.")
 
