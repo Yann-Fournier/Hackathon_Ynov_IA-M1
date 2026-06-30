@@ -1,0 +1,7 @@
+pandas
+datasets
+pyarrow
+matplotlib
+seaborn
+tqdm
+jupyter
