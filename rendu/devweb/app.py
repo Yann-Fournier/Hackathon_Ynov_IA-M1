@@ -1,6 +1,5 @@
 import streamlit as st
-import requests
-from datetime import datetime
+from backend import get_client, ConversationHistory
 
 OLLAMA_URL = "http://localhost:11434"
 MODEL_NAME = "techcorp-finance"
@@ -184,28 +183,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-def check_connection():
-    try:
-        r = requests.get(f"{OLLAMA_URL}/api/tags", timeout=2)
-        return r.status_code == 200
-    except:
-        return False
+client = get_client(base_url=OLLAMA_URL, model=MODEL_NAME)
 
+if "history" not in st.session_state:
+    st.session_state.history = ConversationHistory()
 
-def chat(messages):
-    r = requests.post(
-        f"{OLLAMA_URL}/api/chat",
-        json={"model": MODEL_NAME, "messages": messages, "stream": False},
-        timeout=300,
-    )
-    r.raise_for_status()
-    return r.json()["message"]["content"]
-
-
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-connected = check_connection()
+connected = client.check_connection().connected
 
 # Sidebar
 with st.sidebar:
@@ -229,13 +212,13 @@ with st.sidebar:
     <div class="sidebar-section">
         <div class="sidebar-title">Session</div>
         <div class="stat-item"><span>Modèle</span><span class="stat-value">{MODEL_NAME}</span></div>
-        <div class="stat-item"><span>Messages</span><span class="stat-value">{len(st.session_state.messages)}</span></div>
-        <div class="stat-item"><span>Serveur</span><span class="stat-value">10.17.164.14</span></div>
+        <div class="stat-item"><span>Messages</span><span class="stat-value">{len(st.session_state.history.as_list())}</span></div>
+        <div class="stat-item"><span>Serveur</span><span class="stat-value">localhost</span></div>
     </div>
     """, unsafe_allow_html=True)
 
     if st.button("🗑️ Effacer la conversation", use_container_width=True):
-        st.session_state.messages = []
+        st.session_state.history.clear()
         st.rerun()
 
     st.markdown("---")
@@ -257,22 +240,20 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Messages
-for msg in st.session_state.messages:
+for msg in st.session_state.history.as_list():
     if msg["role"] == "user":
         st.markdown(f"""
         <div style="display:flex; justify-content:flex-end; margin: 8px 0;">
             <div>
                 <div class="msg-user">{msg["content"]}</div>
-                <div class="msg-time msg-time-right">{msg.get("time", "")}</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
-    else:
+    elif msg["role"] == "assistant":
         st.markdown(f"""
         <div style="display:flex; justify-content:flex-start; margin: 8px 0;">
             <div>
                 <div class="msg-assistant">{msg["content"]}</div>
-                <div class="msg-time">{msg.get("time", "")}</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -286,12 +267,11 @@ else:
     prompt = st.chat_input("Posez votre question financière...", disabled=not connected)
 
 if prompt:
-    now = datetime.now().strftime("%H:%M")
-    st.session_state.messages.append({"role": "user", "content": prompt, "time": now})
+    st.session_state.history.add_user(prompt)
     with st.spinner("L'assistant réfléchit..."):
         try:
-            response = chat([{"role": m["role"], "content": m["content"]} for m in st.session_state.messages])
-            st.session_state.messages.append({"role": "assistant", "content": response, "time": datetime.now().strftime("%H:%M")})
+            response = "".join(client.chat(st.session_state.history.as_list(), stream=False))
+            st.session_state.history.add_assistant(response)
             st.rerun()
         except Exception as e:
             st.error(f"Erreur : {e}")
