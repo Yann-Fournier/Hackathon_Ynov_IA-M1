@@ -20,7 +20,7 @@ import requests
 
 DEFAULT_BASE_URL = "http://localhost:11434"
 DEFAULT_TIMEOUT = 5  # seconds, for status checks
-CHAT_TIMEOUT = 120  # seconds, for generation requests
+CHAT_TIMEOUT = 300  # seconds, tolerates a cold model load on first request
 
 
 @dataclass
